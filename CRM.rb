@@ -10,6 +10,7 @@ class CRM
   end
 
   def print_main_menu
+    puts "What would you like to do?"
     puts "[1] Add a new contact"
     puts "[2] Modify an existing contact"
     puts "[3] Delete a contact"
@@ -23,7 +24,8 @@ class CRM
     print_main_menu
     user_selected = gets.to_i
     call_option(user_selected)
-    until user_selected == 6 do 
+    until user_selected == 6 do
+
       print_main_menu
       user_selected = gets.to_i
       call_option(user_selected)
@@ -45,66 +47,77 @@ class CRM
   end
 
   def modify_existing_contact
+    puts "\e[H\e[2J"
+    display_all_contacts
     puts "Whose information would you like to modify?"
     single_contact = gets.chomp
-
-    puts "Enter the element you would like to change."
-    puts"[1] First Name"
-    puts"[2] Last Name"
-    puts"[3] Email"
-    puts"[4] Note"
-    to_modify = (gets.chomp.to_i)
-    puts "Enter the new value."
-    modification = gets.chomp
-    puts "\e[H\e[2J"
-  
+    if confirm_change?
+      puts "Enter the element you would like to change."
+      puts"[1] First Name"
+      puts"[2] Last Name"
+      puts"[3] Email"
+      puts"[4] Note"
+      to_modify = (gets.chomp.to_i)
+      puts "Enter the new value."
+      modification = gets.chomp
+      puts "\e[H\e[2J"
     
-    Rolodex.contacts.each do |x|
-      if x.first_name == single_contact || x.last_name == single_contact
-        case to_modify
-        when 1
-          puts "It was #{x.first_name}"
-          x.first_name = modification 
-          puts "Now it's #{x.first_name}"
-        when 2
-         puts "It was #{x.last_name}"
-         x.last_name = modification
-         puts "Now it's #{x.last_name}"
-         when 3
-         puts "It was #{x.email}"
-         x.email = modification
-         puts "Now it's #{x.email}"
-         when 4
-         puts "It was #{x.note}"
-         x.note = modification
-         puts "Now it's #{x.note}"
-        else
-          puts "That's not an option"
+      
+      Rolodex.contacts.each do |x|
+        if x.first_name == single_contact || x.last_name == single_contact
+          case to_modify
+          when 1
+            puts "It was #{x.first_name}"
+            puts "It will be #{modification}"
+            x.first_name = modification if confirm_change?
+            puts "Now it's #{x.first_name}"
+          when 2
+           puts "It was #{x.last_name}"
+           puts "It will be #{modification}"
+           x.last_name = modification if confirm_change?
+           puts "Now it's #{x.last_name}"
+           when 3
+           puts "It was #{x.email}"
+           puts "It will be #{modification}"
+           x.email = modification if confirm_change?
+           puts "Now it's #{x.email}"
+           when 4
+           puts "It was #{x.note}"
+           puts "It will be #{modification}"
+           x.note = modification if confirm_change?
+           puts "Now it's #{x.note}"
+          else
+            puts "That's not an option"
+          end
         end
       end
     end
   end
 
   def delete_a_contact
+    display_all_contacts
     puts "Whose information would you like to delete?"
     to_delete = gets.chomp
 
     Rolodex.contacts.each do |x|
       if x.first_name == to_delete || x.last_name == to_delete
-        x.first_name = nil
-        x.last_name = nil
-        x.email = nil
-        x.note = nil
-      else
-        puts "That entry does not exist."
-
+        puts "This will delete:"
+        puts "#{x.last_name}, #{x.first_name}"
       end
     end
+
+    Rolodex.contacts.delete_if{|x| ((x.first_name == to_delete || x.last_name == to_delete) && confirm_change?)}
+      
+        # x.first_name = nil
+        # x.last_name = nil
+        # x.email = nil
+        # x.note = nil
     puts "\e[H\e[2J"
   end
 
   def display_all_contacts
     puts "\e[H\e[2J"
+    puts "The current contacts are:"
     Rolodex.contacts.each do|x|
       puts "#{x.last_name},   #{x.first_name},  Email: #{x.email};  Note: #{x.note}"
     end
@@ -118,10 +131,10 @@ class CRM
     puts"[3] Email"
     puts"[4] Note"
     display_val = (gets.chomp.to_i)
-  
+    
     puts "Whose?"
     single_contact = gets.chomp
-    puts "\e[H\e[2J"
+
     Rolodex.contacts.each do |x|
       if x.first_name == single_contact || x.last_name == single_contact
         case display_val
@@ -145,6 +158,7 @@ class CRM
   # end
 
 
+
   def call_option(user_selected)
     add_new_contact if user_selected == 1
     modify_existing_contact if user_selected == 2
@@ -156,6 +170,16 @@ class CRM
     # Finish off and do the rest for 3 through 6
     # To be clear, the methods add_new_contact and modify_existing_contact
     # haven't been defined yet
+  end
+
+  def confirm_change?
+    puts "Are you sure?"
+    confirmation = gets.chomp
+    if confirmation == "y"|| confirmation == "Y"|| confirmation == "Yes"
+      return true
+    else 
+      return false
+    end
   end
 
 end
