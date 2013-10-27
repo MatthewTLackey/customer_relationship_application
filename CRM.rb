@@ -42,7 +42,13 @@ class CRM
     print "Enter Last Name: "
     last_name = gets.chomp
     print "Enter Email Address: "
-    email = gets.chomp
+    test_email = gets.chomp
+    until /\w+[@]\w+[.]\w+/.match(test_email)
+      puts "That's not a valid email address."
+      puts "Enter a new Email address:"
+      test_email = gets.chomp
+    end
+    email = test_email
     print "Enter a Note: "
     note = gets.chomp
     contact = Contact.new(first_name, last_name, email, note)
@@ -130,11 +136,7 @@ class CRM
 
   def display_an_attribute
     puts "\e[H\e[2J"
-    puts "Enter the type of element you would like to see."
-    puts"[1] First Name"
-    puts"[2] Last Name"
-    puts"[3] Email"
-    puts"[4] Note"
+    second_menu
     display_val = (gets.chomp.to_i)
     
     puts "Whose?"
@@ -144,13 +146,15 @@ class CRM
       if x.first_name == single_contact || x.last_name == single_contact || x.id.to_s == single_contact
         case display_val
         when 1
-         puts "#{x.first_name}"
+          puts "#{x.first_name}"
         when 2
-         puts "#{x.last_name}"
-         when 3
-         puts "#{x.email}"
-         when 4
-         puts "#{x.note}"
+          puts "#{x.last_name}"
+        when 3
+          puts "#{x.email}"
+        when 4
+          puts "#{x.note}"
+        when 5
+          puts "#{x.id}"
         else
           puts "That's not an option"
         end
@@ -172,12 +176,7 @@ class CRM
 
   def display_all_of_one_attribute
     puts "\e[H\e[2J"
-    puts "Enter the type of element you would like to see."
-    puts"[1] First Name"
-    puts"[2] Last Name"
-    puts"[3] Email"
-    puts"[4] Note"
-    puts "[5] Id number"
+    second_menu
     display_val = (gets.chomp.to_i)
 
     case display_val
@@ -227,21 +226,21 @@ class CRM
     end
   end
 
+  def second_menu
+    puts "Enter the type of element you would like to see."
+    puts"[1] First Name"
+    puts"[2] Last Name"
+    puts"[3] Email"
+    puts"[4] Note"
+    puts "[5] Id number"
+  end
+
 end
 
 
 
 my_crm = CRM.new("First CRM")
-
-my_contact = Contact.new("Adrian", "Carton de Wiart", "adianwiart@gmail.com", "Even cooler.")
-contact2 = Contact.new("Esteban", "Robo", "123@thewolf.com", "He's an asshole")
-contact3 = Contact.new("Ralph", "Huckster", "getatme@supercool.com", "Super genuine")
-
 my_rolodex = Rolodex.new
-
-
-
-
 
 my_crm.main_menu
 
