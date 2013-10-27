@@ -15,16 +15,19 @@ class CRM
     puts "[2] Modify an existing contact"
     puts "[3] Delete a contact"
     puts "[4] Display all the contacts"
-    puts "[5] Display an attribute" 
-    puts "[6] Exit"
+    puts "[5] Display a specific attribute"
+    puts "[6] Display a specific contact"
+    puts "[7] Display all entries of an attribute"
+    puts "[8] Exit"
     puts "Enter a number: "
   end
 
   def main_menu
+    puts "\e[H\e[2J"
     print_main_menu
     user_selected = gets.to_i
     call_option(user_selected)
-    until user_selected == 6 do
+    until user_selected == 8 do
 
       print_main_menu
       user_selected = gets.to_i
@@ -33,6 +36,7 @@ class CRM
   end
 
   def add_new_contact
+    puts "\e[H\e[2J"
     print "Enter First Name: "
     first_name = gets.chomp
     print "Enter Last Name: "
@@ -64,7 +68,7 @@ class CRM
     
       
       Rolodex.contacts.each do |x|
-        if x.first_name == single_contact || x.last_name == single_contact
+        if x.first_name == single_contact || x.last_name == single_contact || x.id.to_s == single_contact
           case to_modify
           when 1
             puts "It was #{x.first_name}"
@@ -95,31 +99,32 @@ class CRM
   end
 
   def delete_a_contact
+    puts "\e[H\e[2J"
     display_all_contacts
     puts "Whose information would you like to delete?"
     to_delete = gets.chomp
 
     Rolodex.contacts.each do |x|
-      if x.first_name == to_delete || x.last_name == to_delete
+      if x.first_name == to_delete || x.last_name == to_delete || x.id.to_s == to_delete
         puts "This will delete:"
         puts "#{x.last_name}, #{x.first_name}"
       end
     end
 
-    Rolodex.contacts.delete_if{|x| ((x.first_name == to_delete || x.last_name == to_delete) && confirm_change?)}
+    Rolodex.contacts.delete_if{|x| ((x.first_name == to_delete || x.last_name == to_delete || x.id.to_s == to_delete) && confirm_change?)}
       
         # x.first_name = nil
         # x.last_name = nil
         # x.email = nil
         # x.note = nil
-    puts "\e[H\e[2J"
+    
   end
 
   def display_all_contacts
     puts "\e[H\e[2J"
     puts "The current contacts are:"
     Rolodex.contacts.each do|x|
-      puts "#{x.last_name},   #{x.first_name},  Email: #{x.email};  Note: #{x.note}"
+      puts "Id: #{x.id} #{x.last_name},   #{x.first_name},  Email: #{x.email};  Note: #{x.note}"
     end
   end
 
@@ -136,7 +141,7 @@ class CRM
     single_contact = gets.chomp
 
     Rolodex.contacts.each do |x|
-      if x.first_name == single_contact || x.last_name == single_contact
+      if x.first_name == single_contact || x.last_name == single_contact || x.id.to_s == single_contact
         case display_val
         when 1
          puts "#{x.first_name}"
@@ -153,11 +158,52 @@ class CRM
     end
   end
 
-  # def exit_program
-  #   puts "Implement me"
-  # end
+  def display_particular_contact
+    puts "\e[H\e[2J"
+    puts "Which contact would you like to display?"
+    puts "Enter an ID number or name"
+    which_contact = gets.chomp
+    Rolodex.contacts.each do |x|
+      if x.first_name == which_contact || x.last_name == which_contact || x.id.to_s == which_contact
+        puts "#{x.id}: #{x.last_name}, #{x.first_name} Email: #{x.email} Note: #{x.note}"
+      end 
+    end
+  end
 
+  def display_all_of_one_attribute
+    puts "\e[H\e[2J"
+    puts "Enter the type of element you would like to see."
+    puts"[1] First Name"
+    puts"[2] Last Name"
+    puts"[3] Email"
+    puts"[4] Note"
+    puts "[5] Id number"
+    display_val = (gets.chomp.to_i)
 
+    case display_val
+    when 1
+      puts "First names:"
+      Rolodex.print_attribute(display_val)
+
+    when 2
+      puts "Last names:"
+      Rolodex.print_attribute(display_val)
+
+    when 3
+      puts "Emails:"
+      Rolodex.print_attribute(display_val)
+
+    when 4
+      puts "Notes:"
+      Rolodex.print_attribute(display_val)
+
+    when 5
+      puts "Id numbers:"
+      Rolodex.print_attribute(display_val)
+    else
+      puts "That is not a valid option."
+    end
+  end
 
   def call_option(user_selected)
     add_new_contact if user_selected == 1
@@ -165,11 +211,10 @@ class CRM
     delete_a_contact if user_selected == 3
     display_all_contacts if user_selected == 4
     display_an_attribute if user_selected == 5
+    display_particular_contact if user_selected == 6
+    display_all_of_one_attribute if user_selected == 7
     #exit_program if user_selected == 6
-  
-    # Finish off and do the rest for 3 through 6
-    # To be clear, the methods add_new_contact and modify_existing_contact
-    # haven't been defined yet
+
   end
 
   def confirm_change?
